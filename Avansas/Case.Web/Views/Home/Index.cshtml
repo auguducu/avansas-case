@@ -1,0 +1,279 @@
+﻿@using Case.Entities.Enum
+@using System.Security.Claims
+@using Case.Entities.Concrete
+@model List<Case.Entities.Concrete.Users>
+@{
+    ViewData["Title"] = "Kullanıcı Listesi";
+}
+
+<div class="kt-portlet kt-portlet--mobile">
+<div class="kt-portlet__head kt-portlet__head--lg">
+    <div class="kt-portlet__head-label">
+        <span class="kt-portlet__head-icon">
+            <i class="kt-font-brand flaticon2-line-chart"></i>
+        </span>
+        <h3 class="kt-portlet__head-title">
+            Kullanıcı Listesi
+        </h3>
+    </div>
+    <div class="kt-portlet__head-toolbar">
+        <div class="kt-portlet__head-wrapper">
+            <div class="kt-portlet__head-actions">
+                &nbsp;
+                <a href="@Url.Action("NewUser")" class="btn btn-brand btn-elevate btn-icon-sm">
+                    <i class="la la-plus"></i>
+                    Yeni Kullanıcı Ekle
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="kt-portlet__body">
+
+    <!--begin: Datatable -->
+    <table class="table table-striped- table-bordered table-hover table-checkable" id="kt_table_1">
+        <thead>
+        <tr>
+            <th>Record ID</th>
+            <th>E-Posta</th>
+            <th>Telefon Numarası</th>
+            <th>Doğum Tarihi</th>
+            <th>Rol</th>
+            <th>Durum</th>
+            <th>#</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        @{
+            foreach (var users in Model.DistinctBy(x => x.Email))
+            {
+                <tr>
+                    <td>@users.FullName</td>
+                    <td>@users.Email</td>
+                    <td>@users.PhoneNumber</td>
+                    <td>@users.BirthDate.ToString("d")</td>
+                    @{
+                        if (users.Role == Roles.Admin)
+                        {
+                            <td>1</td>
+                            if (users.IsActive)
+                            {
+                                <td>1</td>
+                            }
+                            else
+                            {
+                                <td>0</td>
+                            }
+                        }
+                        else
+                        {
+                            <td>2</td>
+                            if (users.IsActive)
+                            {
+                                <td>1</td>
+                            }
+                            else
+                            {
+                                <td>0</td>
+                            }
+                        }
+                        if (@User.Claims.FirstOrDefault(r => r.Type == ClaimTypes.Role).Value == Roles.Admin.ToString())
+                        {
+                            <td>
+                                <span class="dropdown">
+                                    <a href="#" class="btn btn-sm btn-clean btn-icon btn-icon-md" data-toggle="dropdown" aria-expanded="true">
+                                        <i class="la la-ellipsis-h"></i>
+                                    </a>
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        <a data-toggle="modal" data-target="#kt_select_modal-@users.Id.ToString().Substring(0, 5)" class="dropdown-item" href="#"><i class="la la-edit"></i> Düzenle</a>
+                                        <a class="dropdown-item" href="#"><i class="la la-leaf"></i> Durumu Değiştir</a>
+                                    </div>
+                                </span>
+                                <a onclick="usersDelete('@users.Id')" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Sil">
+                                    <i class="la la-trash"></i>
+                                </a>
+                            </td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                    }
+                </tr>
+
+                <!--begin::Modal-->
+                <div class="modal fade" id="kt_select_modal-@users.Id.ToString().Substring(0, 5)" role="dialog" aria-labelledby="" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="">Bootstrap Touchspin Examples</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true" class="la la-remove"></span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group row kt-margin-t-20">
+                                    <label class="col-form-label col-lg-3 col-sm-12">Ad:</label>
+                                    <div class="col-lg-9 col-md-9 col-sm-12">
+                                        <input type="text" name="FirstName-@users.Id.ToString().Substring(0, 5)" class="form-control" placeholder="" value="@users.FirstName">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-form-label col-lg-3 col-sm-12">Soyad:</label>
+                                    <div class="col-lg-9 col-md-9 col-sm-12">
+                                        <input type="text" name="LastName-@users.Id.ToString().Substring(0, 5)" class="form-control" placeholder="" value="@users.LastName">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-form-label col-lg-3 col-sm-12">E-posta</label>
+                                    <div class="col-lg-9 col-md-9 col-sm-12">
+                                        <input type="text" name="Email-@users.Id.ToString().Substring(0, 5)" class="form-control" placeholder="" value="@users.Email">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-form-label col-lg-3 col-sm-12">Telefon Numarası</label>
+                                    <div class="col-lg-9 col-md-9 col-sm-12">
+                                        <input type="text" name="PhoneNumber-@users.Id.ToString().Substring(0, 5)" class="form-control" placeholder="" value="@users.PhoneNumber">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-form-label col-lg-3 col-sm-12">Doğum Tarihi</label>
+                                    <div class="col-lg-9 col-md-9 col-sm-12">
+                                        <input type="date" name="BirthDate-@users.Id.ToString().Substring(0, 5)" class="form-control" placeholder="" value="@users.BirthDate.ToString("d")">
+
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-form-label col-lg-3 col-sm-12">Şifre</label>
+                                    <div class="col-lg-9 col-md-9 col-sm-12">
+                                        <input type="password" name="Password-@users.Id.ToString().Substring(0, 5)" class="form-control" placeholder="" value="@users.Password" disabled="disabled">
+                                    </div>
+                                </div>
+                                <div class="form-group row kt-margin-b-20">
+                                    <label class="col-form-label col-lg-3 col-sm-12">Rol</label>
+                                    <div class="col-lg-9 col-md-9 col-sm-12">
+                                        <select name="Role-@users.Id.ToString().Substring(0, 5)" class="form-control kt-selectpicker">
+                                            @{
+                                                if (users.Role == Roles.Admin)
+                                                {
+                                                    <option value="1" selected>Admin</option>
+                                                    <option value="2">User</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="1">Admin</option>
+                                                    <option value="2" selected>User</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-brand kt-btn" data-dismiss="modal">Close</button>
+                                <button onclick="usersUpdate('@users.Id','@users.Id.ToString().Substring(0, 5)')" class="btn btn-secondary kt-btn">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--end::Modal-->
+            }
+        }
+        </tbody>
+    </table>
+
+    <!--end: Datatable -->
+</div>
+</div>
+
+<script>
+        function usersDelete(userId,idx) {
+            swal.fire({
+                customClass: {
+                    confirmButton: 'btn btn-success btnAlert',
+                    cancelButton: 'btn btn-danger btnAlert'
+                },
+                buttonsStyling: false,
+                title: 'Uyarı',
+                text: 'Bu kullanıcıyı silmek istediğinize emin misiniz?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, Eminim',
+                cancelButtonText: 'Vazgeçtim',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Home/DeleteUser",
+                        data: {
+                            "id": userId
+                        },
+                        contentType: "application/x-www-form-urlencoded",
+                        dataType: "json",
+                        success: function (result) {
+                            swal.fire({
+                                title: 'Başarılı',
+                                text: 'Kullanıcı Silindi',
+                                type: 'success',
+                                confirmButtonText: 'Tamam'
+                            }),
+                            location.reload();
+                        },
+                        error: function (req, status, error) {
+                            location.reload();
+                        }
+                    });
+                }
+            });
+        }
+</script>
+<script>
+        function usersUpdate(userId,idx) {
+            swal.fire({
+                customClass: {
+                    confirmButton: 'btn btn-success btnAlert',
+                    cancelButton: 'btn btn-danger btnAlert'
+                },
+                buttonsStyling: false,
+                title: 'Uyarı',
+                text: 'Kullanıcı bilgilerini güncelemek istediğinize emin misiniz?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, Eminim',
+                cancelButtonText: 'Vazgeçtim',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/Home/UpdateUser",
+                        data: {
+                            "id": userId,
+                            "FirstName": document.getElementsByName("FirstName-"+idx)[0].value,
+                            "LastName": document.getElementsByName("LastName-"+idx)[0].value,
+                            "Email": document.getElementsByName("Email-"+idx)[0].value,
+                            "PhoneNumber": document.getElementsByName("PhoneNumber-"+idx)[0].value,
+                            "BirthDate": document.getElementsByName("BirthDate-"+idx)[0].value,
+                            "Password": document.getElementsByName("Password-"+idx)[0].value,
+                            "Role": document.getElementsByName("Role-"+idx)[0].value
+                        },
+                        contentType: "application/x-www-form-urlencoded",
+                        dataType: "json",
+                        success: function (result) {
+                            swal.fire({
+                                title: 'Başarılı',
+                                text: 'Kullanıcı Güncellendi',
+                                type: 'success',
+                                confirmButtonText: 'Tamam'
+                            }),
+                            location.reload();
+                        },
+                        error: function (req, status, error) {
+                        }
+                    });
+                }
+            });
+        }
+</script>
